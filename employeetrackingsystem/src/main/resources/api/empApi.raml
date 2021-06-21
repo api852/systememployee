@@ -1,0 +1,230 @@
+#%RAML 1.0
+title: EmployeeTrackingSystem
+types:
+  ETS: !include /schema/employeedataType.raml
+  Error: !include /schema/errorhandling.raml
+traits:
+  client-id-required:
+   queryParameters:
+     client-id:
+        description: client-id for the authentication purpose.
+        type: string
+        minLength: 5
+        required: true
+     client-secret:
+        description: client-secret for the authentication purpose.
+        type: string
+        minLength: 5
+        required: true 
+           
+/insert:
+  is: [client-id-required]
+  post:
+    description: for adding new employees
+    body:
+     application/json:
+       type: ETS
+       examples: !include /employeedata/employeeexample.raml
+            
+    responses:
+     201:
+       body:
+        application/json:
+         example:
+          message: data inserted
+     405:
+       description: Method Not Allowed 
+       body:
+         application/json:
+          type: Error
+          example:
+            {"message" : "Method Not Allowed", "code" : 405}
+     401:
+        description: Un Authorised
+        body:
+          application/json:
+            type: Error
+            example:
+             { "message" : "Un Authorised", "code" : 401}       
+     500:
+        description: Internal Server Error
+        body:
+          application/json:
+            type: Error
+            example:
+              {"message" : "Internal Server Error", "code" : 500}
+
+     429:
+         description: Too Many Requests
+         body:
+           application/json:
+            type: Error
+            example:
+              {"message" : "Too Many Requests", "code" : 429}
+
+
+     400:
+        description: Bad Request
+        body:
+          application/json:
+            type: Error
+            example:
+              {"message" : "Bad Request", "code" : 400}
+     403:
+          description: "For bidden"
+          body:
+              application/json:
+                type: Error
+                example:
+                  {"message" : "For bidden", "code" : 403}
+                          
+
+
+/update:
+  is: [client-id-required]
+  patch:
+    description: for updating employee record
+    body:
+      application/json:
+        type: ETS
+        examples: !include /employeedata/employeeexample.raml
+
+    responses:
+      200:
+        body:
+          application/json:
+            example:
+              message: data updated
+      429:
+         description: Too Many Requests
+         body:
+           application/json:
+            type: Error
+            example:
+              {"message" : "Too Many Requests", "code" : 429}
+      401:
+        description: Un Authorised
+        body:
+          application/json:
+            type: Error
+            example:
+             { "message" : "Un Authorised", "code" : 401}
+      500:
+        description: Internal Server Error
+        body:
+          application/json:
+            type: Error
+            example:
+              {"message" : "Internal Server Error", "code" : 500}
+
+      400:
+        description: Bad Request
+        body:
+          application/json:
+            type: Error
+            example:
+              {"message" : "Bad Request", "code" : 400}
+      403:
+          description: "For bidden"
+          body:
+              application/json:
+                type: Error
+                example:
+                  {"message" : "For bidden", "code" : 403}
+      
+      405:                          
+       description: Method Not Allowed 
+       body:
+         application/json:
+          type: Error
+          example:
+            {"message" : "Method Not Allowed", "code" : 405}
+  
+
+/delete:
+  is: [client-id-required]
+  delete:
+    description: for deleting employee record
+    queryParameters:
+      Id:
+        type: integer
+        required: true
+   
+
+    responses:
+     200:
+      body:
+        application/json:
+          example:
+            message: data deleted
+     500:
+      description: Internal Server Error
+      body:
+        application/json:
+          type: Error
+          example:
+            {"message" : "Internal Server Error", "code" : 500}
+     405:                          
+       description: Method Not Allowed 
+       body:
+         application/json:
+          type: Error
+          example:
+            {"message" : "Method Not Allowed", "code" : 405}
+     403:
+       description: "For bidden"
+       body:
+          application/json:
+            type: Error
+            example:
+              {"message" : "For bidden", "code" : 403}
+
+     400:
+        description: Bad Request
+        body:
+          application/json:
+            type: Error
+            example:
+              {"message" : "Bad Request", "code" : 400}           
+            
+     429:
+       description: Too Many Requests
+       body:
+         application/json:
+           type: Error
+           example:
+              {"message" : "Too Many Requests", "code" : 429}                     
+
+          
+        
+
+
+
+    
+      
+
+          
+          
+          
+         
+          
+                                                
+                                                  
+                                                  
+                                                  
+                                                  
+                                                    
+                                                  
+                                                            
+                                                              
+                                                                
+                                                              
+                                                          
+                                                              
+                                                              
+                                                          
+                                                        
+
+                                                                                      
+        
+                                

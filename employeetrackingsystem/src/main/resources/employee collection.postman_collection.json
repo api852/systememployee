@@ -1,0 +1,121 @@
+{
+	"info": {
+		"_postman_id": "50ab8cd9-e50d-470a-91bc-d6779383ea74",
+		"name": "employee collection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "http://localhost:8081/api/insert?client-id=12345&client-secret=12345",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n        \"Manager\": \"abcdeabcd\",\r\n        \"City\": \"Guntur\",\r\n        \"Name\": \"rutvik\",\r\n        \"Project\": \"Employe System\",\r\n        \"Id\": 11,\r\n        \"Email\": \"chandu@gmail.com\",\r\n        \"Age\": 26\r\n    }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/api/insert?client-id=12345&client-secret=12345",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"api",
+						"insert"
+					],
+					"query": [
+						{
+							"key": "client-id",
+							"value": "12345"
+						},
+						{
+							"key": "client-secret",
+							"value": "12345"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8081/api/update?client-id=12345&client-secret=12345",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n        \"Manager\": \"xyz\",\r\n        \"City\": \"Guntur\",\r\n        \"Name\": \"rutvik\",\r\n        \"Project\": \"Employe System\",\r\n        \"Id\": 11,\r\n        \"Email\": \"gollapudi@gmail.com\",\r\n        \"Age\": 24\r\n    }",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8081/api/update?client-id=12345&client-secret=12345",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"api",
+						"update"
+					],
+					"query": [
+						{
+							"key": "client-id",
+							"value": "12345"
+						},
+						{
+							"key": "client-secret",
+							"value": "12345"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8081/api/delete?Id=7&client-id=12345&client-secret=12345",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8081/api/delete?Id=7&client-id=12345&client-secret=12345",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8081",
+					"path": [
+						"api",
+						"delete"
+					],
+					"query": [
+						{
+							"key": "Id",
+							"value": "7"
+						},
+						{
+							"key": "client-id",
+							"value": "12345"
+						},
+						{
+							"key": "client-secret",
+							"value": "12345"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

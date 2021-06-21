@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:email="http://www.mulesoft.org/schema/mule/email" xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd">
+	<flow name="insertFlow" doc:id="c1f2e9bc-46fa-4116-81f6-9b49cd6ddcda" >
+		<db:insert doc:name="Insert" doc:id="b64f7ca2-90dc-4268-93a1-09f3c2898a49" config-ref="Database_Config">
+			<db:sql ><![CDATA[insert into employee(Id, Name, Email, Age, City, Project,Manager)
+values(:Id,:Name,:Email,:Age,:City,:Project,:Manager)
+
+]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{Id:payload.Id,Name:payload.Name,Email:payload.Email,Age:payload.Age,City:payload.City,Project:payload.Project,Manager:payload.Manager}]]]></db:input-parameters>
+		</db:insert>
+		<ee:transform doc:name="Transform Message" doc:id="6d603d22-09a9-4b85-9624-0b4385d55bdb">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message:"data inserted sucessfully"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<db:select doc:name="Select" doc:id="42624225-8d49-4e68-b42a-d2a6cd36bfe4" config-ref="Database_Config">
+			<db:sql ><![CDATA[select * from employee]]></db:sql>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="7eba4096-acec-47df-b3f1-a8ec6beb6da3" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload map {
+	
+	Name__c : $.Name,
+	Age__c : $.Age,
+	City__c : $.City,
+	Email__c : $.Email,
+	Id__c : $.Id,
+	Project__c : $.Project,
+	Manager__c : $.Manager 
+	}
+	
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<salesforce:upsert objectType="employee__c" externalIdFieldName="Id__c" doc:name="Upsert" doc:id="150b19cb-248b-44e9-8fea-bb87d78570bd" config-ref="Salesforce_Config" />
+		<logger level="INFO" doc:name="Logger" doc:id="2b303893-f8f8-40b1-831c-64db659a20ab" message="data inserted into salesforce"/>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="6c7a7267-3d44-4441-9409-df996f494e0a" type="ANY">
+				<email:send doc:name="Send" doc:id="1592bc04-ac25-4d24-8a38-2ccad8a65983" fromAddress="sanudeepreddy1016@gmail.com" subject='#["mail from muel server 4"]' config-ref="Email_SMTP">
+					<email:to-addresses >
+						<email:to-address value="chandinialekhya2003@gmail.com" />
+						<email:to-address value="anudeep.suravarapu@apisero.com" />
+					</email:to-addresses>
+					<email:cc-addresses />
+					<email:body contentType="application/json" >
+						<email:content ><![CDATA[#[error.errorType]]]></email:content>
+					</email:body>
+				</email:send>
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	<flow name="updateFlow" doc:id="4be4b137-a453-4f97-9363-e0066d89e678" >
+		<http:listener doc:name="update" doc:id="a1984455-590a-4696-85ca-9319dc78473b" path="/update" allowedMethods="POST" config-ref="HTTP_Listener_config"/>
+		<db:update doc:name="Update" doc:id="b3eb79d4-9ae5-482b-980e-9a561716b12e" config-ref="Database_Config">
+			<db:sql ><![CDATA[UPDATE employee SET  Name=:Name,Email=:Email,Age=:Age,City=:City,Project=:Project,Manager=:Manager WHERE Id = :Id]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{Manager:payload.Manager,Id:payload.Id,Age:payload.Age,Email:payload.Email,Name:payload.Name,City:payload.City,Project:payload.Project}]]]></db:input-parameters>
+		</db:update>
+		<ee:transform doc:name="Transform Message" doc:id="2379a510-be3c-42b2-b7e3-d95e45d20738" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	message:"data update sucessfully"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<db:select doc:name="Select" doc:id="e561d87c-e112-4afa-bc0d-4a816760b75e" config-ref="Database_Config">
+			<db:sql><![CDATA[select * from employee]]></db:sql>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="0324b53c-845f-4e70-8f42-714f7b0cb17f" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+payload map ( payload01 , indexOfPayload01 ) -> {
+	Age__c: payload01.Age,
+	Project__c: payload01.Project,
+	Id__c: payload01.Id,
+	City__c: payload01.City,
+	Manager__c: payload01.Manager,
+	Email__c: payload01.Email,
+	Name__c: payload01.Name
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<salesforce:upsert objectType="employee__c" externalIdFieldName="Id__c" doc:name="update" doc:id="7c2f789c-6992-4683-998b-7df6fc342641" config-ref="Salesforce_Config"/>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="691ed16b-5874-4ad0-a2d3-e8d48c0abb48" type="ANY">
+				<email:send doc:name="Send" doc:id="a7fca998-ead4-47f7-b441-e2ce5f59d578" fromAddress="sanudeepreddy1016@gmail.com" subject='#["mail from muel server 4"]' config-ref="Email_SMTP">
+					<email:to-addresses >
+						<email:to-address value="chandinialekhya2003@gmail.com" />
+						<email:to-address value="anudeep.suravarapu@apisero.com" />
+					</email:to-addresses>
+					<email:cc-addresses />
+					<email:body contentType="application/json" >
+						<email:content ><![CDATA[#[error.errorType]]]></email:content>
+					</email:body>
+				</email:send>
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	<flow name="deleteFlow" doc:id="09973ba5-8834-494e-91a5-291c2e0c3e63" >
+		<http:listener doc:name="delete" doc:id="4e888b0c-aae1-4d18-8e3e-b89cea9d9884" path="/delete" allowedMethods="DELETE" config-ref="HTTP_Listener_config"/>
+		<set-variable value="#[attributes.queryParams.Id]" doc:name="Set Variable" doc:id="2387c7f8-46ff-4001-847c-c670e4b40151" variableName="Id"/>
+		<db:delete doc:name="Delete" doc:id="4de3d77f-dc52-4438-a2ca-536159381ef9" config-ref="Database_Config">
+			<db:sql ><![CDATA[delete from xyz.employee where Id=:Id ]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{Id:vars.Id}]]]></db:input-parameters>
+		</db:delete>
+		<salesforce:query doc:name="Query" doc:id="e1874367-1363-4226-9cda-5cd6a7c42549" config-ref="Salesforce_Config">
+			<salesforce:salesforce-query ><![CDATA[select Id,Name__c,Age__c,City__c,Email__c,Project__c,Manager__c from employee__c where Id__c=:Id]]></salesforce:salesforce-query>
+			<salesforce:parameters ><![CDATA[#[{Id:vars.Id}]]]></salesforce:parameters>
+		</salesforce:query>
+		<salesforce:delete doc:name="Delete" doc:id="278b5dc5-afbc-4f6e-a03e-e8d078547660" config-ref="Salesforce_Config">
+			<salesforce:ids ><![CDATA[#[payload.Id]]]></salesforce:ids>
+		</salesforce:delete>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="ed634ea6-d3b2-4570-b044-757be396a5ac" type="ANY">
+				<email:send doc:name="Send" doc:id="e6eb3bd6-61da-4844-be0e-1bff2b2d02e9" fromAddress="sanudeepreddy1016@gmail.com" subject='#["mail from muel server 4"]' config-ref="Email_SMTP">
+					<email:to-addresses >
+						<email:to-address value="chandinialekhya2003@gmail.com" />
+						<email:to-address value="anudeep.suravarapu@apisero.com" />
+					</email:to-addresses>
+					<email:cc-addresses />
+					<email:body contentType="application/json" >
+						<email:content ><![CDATA[#[error.errorType]]]></email:content>
+					</email:body>
+				</email:send>
+			</on-error-continue>
+		</error-handler>
+	</flow>
+	<flow name="employeetrackingsystemFlow" doc:id="b586aa9f-cc1d-4620-8ae4-fd1d513160fb" >
+		<scheduler doc:name="Scheduler" doc:id="15263208-97ee-4e98-b7ae-d224d6f8603a" >
+			<scheduling-strategy >
+				<cron expression="0 0 20 * * ?" timeZone="Canada/Central" />
+			</scheduling-strategy>
+		</scheduler>
+		<db:select doc:name="Select" doc:id="7d6e988a-49d1-476c-a311-0664492b9d70" config-ref="Database_Config">
+			<db:sql><![CDATA[select * from employee]]></db:sql>
+		</db:select>
+		<file:write doc:name="Write" doc:id="b6e1ff22-32bb-481b-b5ab-df34a5b5fbd4" path="emplist2.csv" mode="APPEND" config-ref="File_Config">
+			<file:content><![CDATA[#[output application/csv header=false --- payload]]]></file:content>
+		</file:write>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="6f9e75c4-78d6-408a-a83b-dcc11d3dd403" type="ANY">
+				<email:send doc:name="Send" doc:id="92098d5f-d66c-441d-8cf9-3ce1aa24f5a6" fromAddress="sanudeepreddy1016@gmail.com" subject='#["mail from muel server 4"]' config-ref="Email_SMTP">
+					<email:to-addresses >
+						<email:to-address value="chandinialekhya2003@gmail.com" />
+						<email:to-address value="anudeep.suravarapu@apisero.com" />
+					</email:to-addresses>
+					<email:cc-addresses />
+					<email:body contentType="application/json" >
+						<email:content ><![CDATA[#[error.errorType]]]></email:content>
+					</email:body>
+				</email:send>
+			</on-error-continue>
+		</error-handler>
+	</flow>
+</mule>
