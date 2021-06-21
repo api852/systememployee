@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:email="http://www.mulesoft.org/schema/mule/email"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="ceaf5c6f-7e07-4df0-836d-2b0ce79f462c" >
+		<db:my-sql-connection host="localhost" port="3306" user="root" password="1016" database="xyz" />
+	</db:config>
+	<email:smtp-config name="Email_SMTP" doc:name="Email SMTP" doc:id="f46c49ff-ce6c-4486-9b1d-72d7d85fd842" >
+		<email:smtp-connection host="smtp.gmail.com" port="587" user="sanudeepreddy1016@gmail.com" password="Anudeep1003" >
+			<email:properties >
+				<email:property key="mail.smtp.starttls.enable" value="true" />
+			</email:properties>
+		</email:smtp-connection>
+	</email:smtp-config>
+	<http:listener-config name="empsystemapi-httpListenerConfig" doc:name="HTTP Listener config" doc:id="fa1bdf12-8073-42e1-b894-88ebd1ec688f" >
+		<http:listener-connection host="0.0.0.0" port="8082" />
+	</http:listener-config>
+</mule>

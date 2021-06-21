@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:json-logger="http://www.mulesoft.org/schema/mule/json-logger" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce"
+	xmlns:email="http://www.mulesoft.org/schema/mule/email" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/json-logger http://www.mulesoft.org/schema/mule/json-logger/current/mule-json-logger.xsd">
+	<json-logger:config name="JSON_Logger_Config" doc:name="JSON Logger Config" doc:id="cd7f1882-8df7-4f57-8e3a-58fd59dcdf5b" environment="${mule.env}" />
+	<configuration-properties doc:name="Configuration properties" doc:id="6fdbe728-79e4-4c05-a3ca-7942a06d96de" file="log.properties" />
+	<flow name="selectFlow" doc:id="d42fe864-048e-48f7-b577-6e1843f1bccb" >
+		<set-variable value="#[attributes.uriParams.ID as Number default '']" doc:name="EmpId" doc:id="1113112a-cf99-46b0-926e-77358a888fa7" variableName="EmpId" />
+		<choice doc:name="Copy_of_Choice" doc:id="a0cb1c5a-24b6-469d-9864-f1d26c21d914" >
+			<when expression="#[vars.EmpId != '']">
+				<db:select doc:name="Select" doc:id="825809ae-517c-487a-989c-1d203425d5db" config-ref="Database_Config">
+					<db:sql ><![CDATA[select * from employee where Id = :Id]]></db:sql>
+					<db:input-parameters ><![CDATA[#[{Id:vars.EmpId}]]]></db:input-parameters>
+				</db:select>
+			</when>
+			<otherwise >
+				<db:select doc:id="e346c82c-cd27-453c-a96f-3b5bba27774e" config-ref="Database_Config" doc:name="Select" >
+					<db:sql ><![CDATA[SELECT * FROM employee]]></db:sql>
+				</db:select>
+			</otherwise>
+		</choice>
+		<ee:transform doc:name="Transform Message" doc:id="23d95d41-ed91-4c3d-bdad-64ca35e5d5c2" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<json-logger:logger doc:id="6e01dfab-8a8c-4fca-8d3c-b5bfe9a1dfbf" config-ref="JSON_Logger_Config" message="log.properties"/>
+		<error-handler >
+			<on-error-continue enableNotifications="true" logException="true" doc:name="Copy_of_On Error Continue" doc:id="d4d414a0-d1db-4388-aff9-443e21e1e62f" type="ANY" >
+				<email:send doc:id="4b67755f-fd9f-4d51-bf33-f8caced926dd" config-ref="Email_SMTP" fromAddress="sanudeepreddy1016@gmail.com" subject='#["mail from muel server 4"]' doc:name="Send" >
+					<email:to-addresses >
+						<email:to-address value="anudeep.suravarapu@apisero.com" />
+						<email:to-address value="chandinialekhya2003@gmail.com" />
+					</email:to-addresses>
+					<email:body >
+						<email:content ><![CDATA[#[error.errorType]]]></email:content>
+					</email:body>
+				</email:send>
+			</on-error-continue>
+		</error-handler>
+	</flow>
+</mule>

@@ -1,0 +1,104 @@
+#%RAML 1.0
+title: empsystemapi
+types:
+  ETS: !include /schema/employeedatatype.raml
+  Error: !include /schema/errorhandling.raml
+traits:
+  client-id-required:
+   queryParameters:
+     client-id:
+        description: client-id for the authentication purpose.
+        type: string
+        minLength: 5
+        required: true
+     client-secret:
+        description: client-secret for the authentication purpose.
+        type: string
+        minLength: 5
+        required: true 
+
+/select:
+  is: [client-id-required]
+  get:
+    description: fetching employee records    
+    responses:
+     200:
+      body:
+       application/json:
+         type: ETS[]    
+         examples: !include /employeedata/employeeexamples.raml
+     401:
+        description: Un Authorised
+        body:
+          application/json:
+            type: Error
+            example:
+             { "message" : "Un Authorised", "code" : 401}
+     400:
+        description: Bad Request
+        body:
+          application/json:
+            type: Error
+            example:
+              {"message" : "Bad Request", "code" : 400}
+     403:
+          description: "For bidden"
+          body:
+              application/json:
+                type: Error
+                example:
+                  {"message" : "For bidden", "code" : 403}                                                 
+
+  /{ID}:
+   get:
+     description: fecting employee details using id
+     responses:
+      200:
+       body:
+        application/json:
+         type: ETS
+         examples: !include /employeedata/employeeexample.raml
+      403:
+          description: "For bidden"
+          body:
+              application/json:
+                type: Error
+                example:
+                  {"message" : "For bidden", "code" : 403}
+      401:
+        description: Un Authorised
+        body:
+          application/json:
+            type: Error
+            example:
+             { "message" : "Un Authorised", "code" : 401}            
+      405:
+       description: Method Not Allowed 
+       body:
+         application/json:
+          type: Error
+          example:
+            {"message" : "Method Not Allowed", "code" : 405} 
+            
+      429:
+         description: Too Many Requests
+         body:
+           application/json:
+            type: Error
+            example:
+              {"message" : "Too Many Requests", "code" : 429}
+      500:
+            description: Internal Server Error
+            body:
+              application/json:
+                type: Error
+                example:
+                  {"message" : "Internal Server Error", "code" : 500}
+                  
+      400:
+        description: Bad Request
+        body:
+          application/json:
+            type: Error
+            example:
+              {"message" : "Bad Request", "code" : 400}

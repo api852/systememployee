@@ -1,0 +1,70 @@
+{
+	"info": {
+		"_postman_id": "ae0d329b-fb75-474d-9b40-5badb44caf7a",
+		"name": "systemApi collection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "http://localhost:8082/api/select/7?client-id=12345&client-secret=12345",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8082/api/select/7?client-id=12345&client-secret=12345",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"api",
+						"select",
+						"7"
+					],
+					"query": [
+						{
+							"key": "client-id",
+							"value": "12345"
+						},
+						{
+							"key": "client-secret",
+							"value": "12345"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8082/api/select?client-id=12345&client-secret=12345",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8082/api/select?client-id=12345&client-secret=12345",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8082",
+					"path": [
+						"api",
+						"select"
+					],
+					"query": [
+						{
+							"key": "client-id",
+							"value": "12345"
+						},
+						{
+							"key": "client-secret",
+							"value": "12345"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
